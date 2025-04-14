@@ -6,8 +6,7 @@ __all__ = ["hello_world"]
 
 
 async def hello_world() -> str:
-    """
-    A simple function that returns a greeting message.
+    """A simple function that returns a greeting message.
 
     Returns:
         str: A greeting message.

@@ -67,7 +67,7 @@ jobs:
             const { repo, owner } = context.repo;
 
             const { data } = await github.rest.pulls.create({
-              title: 'Merge release tag ${{ env.current_version }} -> ${{ env.new_version }}',
+              title: 'bump: version ${{ env.current_version }} -> ${{ env.new_version }}',
               owner,
               repo,
               head: 'github-action-release/${{env.new_version}}',
