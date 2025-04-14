@@ -18,8 +18,11 @@ Creating your project
 ---------------------
 
 After cloning this repository, rename the ``hello_world`` folder to the name of your project.
+
 Then, replace the entire project by replacing ``hello_world`` with the name of your project,
 for example ``my_project``. Also search for ``carlosdorneles-mb`` and replace it with ``mercadobitcoin``.
+
+In ``.github/workflows/notifier.yml`` you should change line 18, adding the data of the space that will receive the notification when a PR is opened.
 
 -----
 
