@@ -9,8 +9,8 @@ allow-direct-references = true
 packages = ["hello_world"]
 
 [project]
-name = "hello_world"
 version = "0.0.0"
+name = "hello_world"
 description = "Base project for creating new python packages"
 readme = "README.rst"
 authors = [
@@ -85,7 +85,7 @@ publish-url = "https://pypi.dev.mercadolitecoin.com.br/"
 explicit = true
 
 [project.urls]
-Documentation = "https://carlosdorneles-mb.github.io/hello_world"
+Documentation = "https://carlosdorneles-mb.github.io/hello_world/"
 Repository = "https://github.com/carlosdorneles-mb/hello_world"
 Changelog = "https://github.com/carlosdorneles-mb/hello_world/blob/main/CHANGELOG.md"
 
@@ -136,6 +136,7 @@ lint.ignore = [
     "D104",
     "D100",
     "COM812",
+    "TRY300",
 ]
 exclude = []
 
@@ -225,7 +226,7 @@ regex = false
 ignore_missing_version = false
 ignore_missing_files = false
 tag = true
-sign_tags = true
+sign_tags = false
 tag_name = "{new_version}"
 tag_message = "bump: version {current_version} → {new_version}"
 allow_dirty = false
@@ -254,10 +255,10 @@ replace = '-{new_version}-'
 [[tool.bumpversion.files]]
 filename = 'pyproject.toml'
 search = '''
-name = "hello_world"
+[project]
 version = "{current_version}"
 '''
 replace = '''
-name = "hello_world"
+[project]
 version = "{new_version}"
 '''

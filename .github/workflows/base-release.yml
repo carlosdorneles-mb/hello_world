@@ -52,7 +52,7 @@ jobs:
       - name: Make Release
         run: |
           git config --global --add safe.directory ${{ github.workspace }}
-          make release-bump ${{ inputs.release-option }}
+          uv run -q bump-my-version bump ${{ inputs.release-option }}
         continue-on-error: false  # Stop on error
 
       - name: Create branch release
@@ -74,13 +74,6 @@ jobs:
               base: '${{ github.head_ref || github.ref_name }}',
               body: 'Created by Github action'
             });
-
-            await github.rest.issues.addLabels({
-              owner,
-              repo,
-              issue_number: data.number,
-              labels: ["release"]
-            })
 
             const result = await github.rest.pulls.requestReviewers({
               owner,

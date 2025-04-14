@@ -38,6 +38,7 @@ help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 init:  ## Set the initial settings for the project
+	@uv lock
 	@rm -rf .venv
 	@echo ${LIGHT_GREEN}"updating the UV version..."${NC}
 	@uv self update
@@ -97,14 +98,12 @@ shell:  ## Run the project shell
 	@uv run ipython --ipython-dir=./
 
 doc run-doc: build-doc  ## Run the documentation server
-	@cd docs
-	@uv run python run.py
+	@uv run python ./docs/run.py
 
 build-doc:
 	@echo ${LIGHT_GREEN}"generating code documentation..."${NC}
-	@cd docs
-	@uv run make clean
-	@uv run make html
+	@cd docs && uv run make clean && cd ..
+	@cd docs && uv run make html
 
 test:  ## Run the application unit tests
 	@uv run pytest -x --full-trace -vvv -n auto --durations=50 --durations-min=10 --timeout=20

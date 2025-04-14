@@ -36,11 +36,11 @@ Describe why the project was created, what it does, and how it can be useful.
 .. _end_title
 
 .. image:: docs/source/_static/read.png
-    :target: https://carlosdorneles-mb.github.io/hello_world
+    :target: https://carlosdorneles-mb.github.io/hello_world/
     :width: 300
     :alt: Read The Docs
 
-- `Project documentation <https://carlosdorneles-mb.github.io/hello_world>`_
+- `Project documentation <https://carlosdorneles-mb.github.io/hello_world/>`_
 - `Project coverage <https://carlosdorneles-mb.github.io/hello_world/_static/coverage/index.html>`_
 
 -----
