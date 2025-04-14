@@ -1,0 +1,65 @@
+name: 🔘 Auto tag release
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  auto-tag:
+    runs-on: self-hosted
+
+    if: github.event.pull_request.merged && contains(github.head_ref, 'github-action-release')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+            version: "latest"
+            enable-cache: true
+            python-version: "3.13"
+
+      - name: Cache the virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ./.venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/uv.lock') }}
+
+      - name: Install dependencies
+        run: |
+          uv venv --allow-existing
+          uv sync --frozen --all-extras
+
+      - name: Configure Git Safe Directory
+        run: git config --global --add safe.directory ${{ github.workspace }}
+
+      - name: Find tag history
+        run: |
+          export CURRENT_VERSION=$(git describe --tags --abbrev=0 | xargs)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_ENV
+
+          export RELEASE_VERSION=$(make release-get-current-version)
+          echo "release_version=$RELEASE_VERSION" >> $GITHUB_ENV
+
+          export IS_PRE_RELEASE=$(make release-current-version-is-pre-release)
+          echo "is_pre_release=$IS_PRE_RELEASE" >> $GITHUB_ENV
+
+      - name: Generate GH release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_MB }}
+          script: |
+            const { repo, owner } = context.repo;
+
+            const isPreRelease = ${{env.is_pre_release}}
+
+            const { data } = await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: '${{env.release_version}}',
+              make_latest: String(!isPreRelease),
+              prerelease: isPreRelease,
+              generate_release_notes: true
+            });

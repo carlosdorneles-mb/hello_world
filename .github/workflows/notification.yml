@@ -1,0 +1,20 @@
+name: 🔘 Pull Request Notification
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+    branches:
+      - "**"
+
+jobs:
+  Gchat-Notification:
+    name: Send Google Chat Notification
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Google Chat Notification
+        continue-on-error: true
+        shell: bash
+        run: |
+          curl --location --request POST 'https://chat.googleapis.com/v1/spaces/<my-space>/messages?key=<my-key>&token=<my-token>' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{"cardsV2":[{"cardId":"unique-card-id","card": { "header": { "title": "Revisão de código solicitada por @${{ github.event.pull_request.user.login }}", "subtitle": "Título: ${{ github.event.pull_request.title }} #${{ github.event.pull_request.number }}", "imageType": "CIRCLE", "imageUrl": "${{ github.event.pull_request.user.avatar_url }}", "imageAltText": "${{ github.event.pull_request.user.login }}" }, "sections": [ { "collapsible": false, "uncollapsibleWidgetsCount": 1, "widgets": [ { "decoratedText": { "topLabel": "<b>URL Pull Request</b>", "text": "<a href=${{ github.event.pull_request.html_url }}>${{ github.event.pull_request.html_url }}</a>", "startIcon": { "knownIcon": "STAR" } } }, { "decoratedText": { "topLabel": "<b>Branch de origem</b>", "text": "${{ github.event.pull_request.head.ref }}", "startIcon": { "knownIcon": "DESCRIPTION" } } }, { "decoratedText": { "topLabel": "<b>Branch de destino</b>", "text": "${{ github.event.pull_request.base.ref }}", "startIcon": { "knownIcon": "DESCRIPTION" } } }, { "decoratedText": { "topLabel": "<b>Solicitado por</b>", "text": "<a href=${{ github.event.pull_request.user.html_url}}>@${{ github.event.pull_request.user.login }}</a>", "startIcon": { "knownIcon": "PERSON" } } }, { "textParagraph": { "text": "" } }, { "buttonList": { "buttons": [ { "text": "Visualizar Pull Request", "onClick": { "openLink": { "url": "${{ github.event.pull_request.html_url }}" } } } ] } } ] } ] } }]}'

@@ -1,0 +1,12 @@
+name: 🔘 Sync Pypi
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  SyncPypi:
+    name: Sync Pypi Dev to Prod
+    runs-on: self-hosted-mercadobitcoin
+    steps:
+      - name: Sync prod
+        run: ${{ secrets.SYNC_PYPI_PROD }}

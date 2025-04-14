@@ -1,0 +1,56 @@
+name: 🔘 Publish package to PyPI
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  UV_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
+  UV_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+jobs:
+  publish:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+            version: "latest"
+            enable-cache: true
+            python-version: "3.13"
+
+      - name: Cache the virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ./.venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/uv.lock') }}
+
+      - name: Install dependencies
+        run: |
+          uv venv --allow-existing
+          uv sync --frozen --all-extras
+
+      - name: Export requirements
+        run: |
+          uv pip compile pyproject.toml -o ./requirements.txt --no-annotate --no-cache --all-extras
+
+      - name: Validate package
+        run: |
+          uv run --with hello_world --refresh-package hello_world --no-project -- python -c "import hello_world"
+        continue-on-error: false
+
+      - name: Build
+        run: |
+          uv build --wheel
+
+      - name: Publish
+        run: |
+          uv publish --index mercadobitcoin
+
+  sync-pypi:
+    needs: [ publish ]
+    uses: ./.github/workflows/sync-pypi.yml
+    secrets: inherit

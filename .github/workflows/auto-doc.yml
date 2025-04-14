@@ -1,0 +1,71 @@
+name: 🔘 Auto doc
+
+on:
+  workflow_run:
+    workflows: [ "🔘 Auto tag release" ]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+            version: "latest"
+            enable-cache: true
+            python-version: "3.13"
+
+      - name: Cache the virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ./.venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/uv.lock') }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y default-libmysqlclient-dev tzdata
+          sudo ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && sudo dpkg-reconfigure -f noninteractive tzdata
+          uv venv --allow-existing
+          uv sync --frozen --all-extras
+
+      - name: Execute unit tests and coverage
+        env:
+          PYTHONPATH: hello_world
+        run: |
+          make test-cov
+          uv run coverage html
+          cp -r htmlcov/* docs/source/_static/coverage/
+
+      - name: Build doc
+        run: make build-doc
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs/build/html'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

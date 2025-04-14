@@ -1,0 +1,92 @@
+name: 🔘 Base release
+
+on:
+  workflow_call:
+    inputs:
+      release-option:
+        required: true
+        type: string
+
+jobs:
+  base-release:
+    runs-on: self-hosted
+
+    permissions:
+      contents: write                # Permissões para modificar conteúdo
+      pull-requests: write           # Permissão para operações com pull requests
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+            version: "latest"
+            enable-cache: true
+            python-version: "3.13"
+
+      - name: Cache the virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ./.venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/uv.lock') }}
+
+      - name: Install dependencies
+        run: |
+          set -e  # Stop the script if fails
+          uv venv --allow-existing || { echo "Failed to initialize the virtual environment"; exit 1; }
+          uv sync --frozen --all-extras || { echo "Error syncing dependencies"; exit 1; }
+
+      - name: Configure git identity
+        run: |
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
+      - name: Configure Variables
+        run: |
+          echo "current_version=$(make release-get-current-version)" >> $GITHUB_ENV
+          echo "new_version=$(make release-get-new-version ${{ inputs.release-option }})" >> $GITHUB_ENV
+
+      - name: Make Release
+        run: |
+          git config --global --add safe.directory ${{ github.workspace }}
+          make release-bump ${{ inputs.release-option }}
+        continue-on-error: false  # Stop on error
+
+      - name: Create branch release
+        run: |
+          git checkout -b github-action-release/${{env.new_version}}
+          git push origin github-action-release/${{env.new_version}} --force --tags
+
+      - name: Create Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+
+            const { data } = await github.rest.pulls.create({
+              title: 'Merge release tag ${{ env.current_version }} -> ${{ env.new_version }}',
+              owner,
+              repo,
+              head: 'github-action-release/${{env.new_version}}',
+              base: '${{ github.head_ref || github.ref_name }}',
+              body: 'Created by Github action'
+            });
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: data.number,
+              labels: ["release"]
+            })
+
+            const result = await github.rest.pulls.requestReviewers({
+              owner,
+              repo,
+              pull_number: data.number,
+              reviewers: [
+                'carlosdorneles-mb',
+              ]
+            });

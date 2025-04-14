@@ -1,0 +1,69 @@
+default_install_hook_types:
+- pre-commit
+- pre-push
+- post-commit
+- commit-msg
+
+default_language_version:
+  python: python3.13
+
+repos:
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.6.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [ commit-msg ]
+        args: [
+          "build",
+          "chore",
+          "ci",
+          "docs",
+          "feat",
+          "fix",
+          "perf",
+          "style",
+          "refactor",
+          "test",
+          "bump",
+        ]
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.6.14
+    hooks:
+      - id: uv-lock
+        stages: [ pre-push ]
+      - id: pip-compile
+        args: [ pyproject.toml, -o, ./requirements.txt, --no-annotate, --no-cache, --all-extras ]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        stages: [ pre-push ]
+      - id: check-added-large-files
+        stages: [ pre-push ]
+      - id: check-builtin-literals
+      - id: end-of-file-fixer
+      - id: debug-statements
+      - id: check-ast
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-yaml
+      - id: no-commit-to-branch
+        args: ['--branch', 'main']
+        stages: [ pre-push ]
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.19.0
+    hooks:
+      - id: pyupgrade
+        args: ['--py3-plus']
+
+  - repo: local
+    hooks:
+      - id: lint
+        name: run lint
+        entry: make lint
+        language: python
+        types_or: [python, pyi]
+        stages: [ pre-push ]
