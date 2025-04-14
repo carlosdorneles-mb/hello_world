@@ -43,7 +43,6 @@ repos:
       - id: check-added-large-files
         stages: [ pre-push ]
       - id: check-builtin-literals
-      - id: end-of-file-fixer
       - id: debug-statements
       - id: check-ast
       - id: check-merge-conflict

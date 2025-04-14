@@ -18,7 +18,7 @@ version = pyproject_data.get("project", {}).get("version")
 release = version
 
 copyright = f"{datetime.now(UTC).year}, Mercado Bitcoin"
-author = f"Carlos Dorneles <carlos.dorneles@mb.com.br>"
+author = "Carlos Dorneles <carlos.dorneles@mb.com.br>"
 
 # ---- General Configuration ----
 
@@ -31,6 +31,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",
     "sphinx_autodoc_typehints",
     "sphinxcontrib.mermaid",
     "sphinx_inline_tabs",

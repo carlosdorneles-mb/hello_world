@@ -50,6 +50,7 @@ init:  ## Set the initial settings for the project
 	@echo ${LIGHT_GREEN}"configuration initialization complete"${NC}
 
 install i requirements: ## Install project dependencies
+	@uv lock
 	@echo ${LIGHT_GREEN}"installing dependencies..."${NC}
 	@uv sync --all-packages --all-extras --all-groups --frozen
 	@echo ${LIGHT_GREEN}"installed dependencies"${NC}
@@ -106,7 +107,7 @@ build-doc:
 	@cd docs && uv run make html
 
 test:  ## Run the application unit tests
-	@uv run pytest -x --full-trace -vvv -n auto --durations=50 --durations-min=10 --timeout=20
+	@uv run pytest -x --full-trace -n auto --durations=50 --durations-min=10 --timeout=20
 
 test-cov:  ## Run tests with coverage
 	@uv run pytest -n auto --timeout=20 --cov=$(PROJECT)/ --rsyncdir=$(PROJECT) --rsyncdir=tests
@@ -137,9 +138,11 @@ reset-tags tags-reset:  ## Reset git tags
 	echo ${LIGHT_GREEN}"The last remote tag is ${LAST_REMOTE_TAG}"${NC}; \
 	echo ${LIGHT_GREEN}"The last locally generated tag is ${LAST_LOCAL_TAG}"${NC}
 
-release-bump release bump:  ## Generates a new major, minor, patch, pre_release, or pre_release_version version. Example: make release-bump patch
+release-bump release bump: reset-tags  ## Generate new version of the project. Example: make release-bump patch
 	@echo
-	@read -p "It is recommended to use Github Actions to create a new version. Do you really want to continue with the $(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) build locally? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
+	@echo "It is recommended to use Github Actions to create a new version."
+	@echo "If you are unsure which version to create, use the command: "${GRAY}"make release-show"${NC}
+	@read -p "Do you really want to continue with the $(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) build locally? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
 	@uv run -q bump-my-version bump $(filter-out $@,$(MAKECMDGOALS))
 	@echo ${LIGHT_GREEN}"A new tag $(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) has been generated."${NC}
 	@echo "To finish, create a new branch and open the PR of the new version: "${GRAY}"git checkout -b github-action-release/$(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) && git push origin github-action-release/$(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) --force --tags --no-verify"${NC}

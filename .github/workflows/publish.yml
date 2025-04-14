@@ -1,6 +1,9 @@
 name: 🔘 Publish package to PyPI
 
 on:
+  push:
+    tags:
+      - '*'
   workflow_run:
     workflows: [ "🔘 Auto tag release" ]
     types:
