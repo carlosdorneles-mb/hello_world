@@ -1,9 +1,8 @@
 name: 🔘 Pull Request Notification
+
 on:
   pull_request:
     types: [opened, reopened, ready_for_review]
-    branches:
-      - "**"
 
 jobs:
   Gchat-Notification:

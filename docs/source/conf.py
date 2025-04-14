@@ -31,6 +31,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",
     "sphinx_autodoc_typehints",
     "sphinxcontrib.mermaid",
     "sphinx_inline_tabs",

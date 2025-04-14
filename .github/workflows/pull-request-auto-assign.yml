@@ -1,0 +1,23 @@
+name: 🔘 Pull Request Auto assign
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  assign_creator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Define criador do PR como responsável (assign) automaticamente
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const prCreator = context.payload.pull_request.user.login;
+
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              assignees: [prCreator]
+            });

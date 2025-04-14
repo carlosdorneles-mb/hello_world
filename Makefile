@@ -50,6 +50,7 @@ init:  ## Set the initial settings for the project
 	@echo ${LIGHT_GREEN}"configuration initialization complete"${NC}
 
 install i requirements: ## Install project dependencies
+	@uv lock
 	@echo ${LIGHT_GREEN}"installing dependencies..."${NC}
 	@uv sync --all-packages --all-extras --all-groups --frozen
 	@echo ${LIGHT_GREEN}"installed dependencies"${NC}
@@ -106,7 +107,7 @@ build-doc:
 	@cd docs && uv run make html
 
 test:  ## Run the application unit tests
-	@uv run pytest -x --full-trace -vvv -n auto --durations=50 --durations-min=10 --timeout=20
+	@uv run pytest -x --full-trace -n auto --durations=50 --durations-min=10 --timeout=20
 
 test-cov:  ## Run tests with coverage
 	@uv run pytest -n auto --timeout=20 --cov=$(PROJECT)/ --rsyncdir=$(PROJECT) --rsyncdir=tests
