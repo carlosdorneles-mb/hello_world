@@ -41,7 +41,7 @@ extensions = [
     "versionwarning.extension",
     "sphinxext.opengraph",
     "sphinxcontrib.autodoc_pydantic",
-    # "enum_tools.autoenum",
+    "enum_tools.autoenum",
     "myst_parser",
 ]
 source_parsers = {

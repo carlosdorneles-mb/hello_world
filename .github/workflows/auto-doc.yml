@@ -59,7 +59,9 @@ jobs:
           cp -r htmlcov/* docs/source/_static/coverage/
 
       - name: Build doc
-        run: make build-doc
+        run: |
+          cd docs
+          uv run make html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

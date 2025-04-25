@@ -98,13 +98,8 @@ shell:  ## Run the project shell
 	@echo ${LIGHT_GREEN}"running shell..."${NC}
 	@uv run ipython --ipython-dir=./
 
-doc run-doc: build-doc  ## Run the documentation server
-	@uv run python ./docs/run.py
-
-build-doc:
-	@echo ${LIGHT_GREEN}"generating code documentation..."${NC}
-	@cd docs && uv run make clean && cd ..
-	@cd docs && uv run make html
+doc run-doc:  ## Run the documentation server
+	@uv run sphinx-autobuild ./docs/source/ docs/build/html
 
 test:  ## Run the application unit tests
 	@uv run pytest -x --full-trace -n auto --durations=50 --durations-min=10 --timeout=20
