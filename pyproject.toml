@@ -138,7 +138,8 @@ lint.ignore = [
     "D104",
     "D100",
     "COM812",
-    "TRY300",
+    "TRY300",  # use else in try/except
+    "RUF022",  # sort __all__
 ]
 exclude = []
 
@@ -156,6 +157,12 @@ docstring-quotes = "double"
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+force-wrap-aliases = true
+length-sort-straight = true
+lines-between-types = 1
 
 [tool.ruff.lint.pycodestyle]
 max-line-length = 120
