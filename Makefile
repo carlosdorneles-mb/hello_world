@@ -98,8 +98,12 @@ shell:  ## Run the project shell
 	@echo ${LIGHT_GREEN}"running shell..."${NC}
 	@uv run ipython --ipython-dir=./
 
-doc run-doc:  ## Run the documentation server
-	@uv run sphinx-autobuild ./docs/source/ docs/build/html
+run-doc doc:  ## Run documentation. Example: make doc ou make doc clear=true
+	@if [ "$(clear)" = "true" ]; then \
+		echo "Cleaning documentation..."; \
+		rm -rf docs/build; \
+	fi
+	@uv run sphinx-autobuild ./docs/source/ docs/build/html/ -v
 
 test:  ## Run the application unit tests
 	@uv run pytest -x --full-trace -n auto --durations=50 --durations-min=10 --timeout=20

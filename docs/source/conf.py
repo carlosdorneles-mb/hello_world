@@ -1,6 +1,6 @@
-import pathlib
 import sys
-import tomllib
+import pathlib
+
 from datetime import UTC, datetime
 
 sys.path.insert(0, pathlib.Path(__file__).parents[2].joinpath("hello_world").resolve().as_posix())
@@ -10,11 +10,8 @@ from theme_config import *  # noqa
 
 # ---- Project Information ----
 
-with open("../../pyproject.toml", "rb") as file:
-    pyproject_data = tomllib.load(file)
-
-project = pyproject_data.get("project", {}).get("name")
-version = pyproject_data.get("project", {}).get("version")
+project = "Hello World"
+version = "0.0.0"
 release = version
 
 copyright = f"{datetime.now(UTC).year}, Mercado Bitcoin"
@@ -60,6 +57,10 @@ suppress_warnings = ["ref.python"]
 viewcode_follow_imported_members = True
 viewcode_line_numbers = True
 
+mermaid_version = "latest"
+mermaid_include_elk = "latest"
+mermaid_d3_zoom = True
+
 tls_verify = False
 intersphinx_mapping = {
     "attrs": ("https://www.attrs.org/en/stable/", None),
@@ -97,5 +98,3 @@ html_favicon = "_static/favicon.png"
 html_show_sphinx = True
 html_domain_indices = True
 html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn"t look great imo.
-
-ogp_site_url = "https://carlosdorneles-mb.github.io/hello_world/"
