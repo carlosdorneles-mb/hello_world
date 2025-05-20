@@ -39,6 +39,7 @@ extensions = [
     "sphinxcontrib.autodoc_pydantic",
     "enum_tools.autoenum",
     "myst_parser",
+    "sphinx_new_tab_link",
 ]
 source_parsers = {
     ".md": "recommonmark.parser.CommonMarkParser",
@@ -83,6 +84,8 @@ autodoc_pydantic_settings_show_json = True
 
 always_document_param_types = True
 always_use_bars_union = True
+
+new_tab_link_show_external_link_icon = True
 
 copybutton_exclude = ".linenos, .gp, ipython, ipythonconsole, python, pythonconsole, console, bash"
 

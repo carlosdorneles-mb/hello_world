@@ -74,6 +74,7 @@ docs = [
     "enum-tools[sphinx]",
     "autodoc-pydantic",
     "sphinx-autobuild",
+    "sphinx-new-tab-link>=0.8.0",
 ]
 
 [tool.uv]
