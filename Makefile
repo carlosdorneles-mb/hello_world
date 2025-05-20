@@ -137,30 +137,17 @@ reset-tags tags-reset:  ## Reset git tags
 	echo ${LIGHT_GREEN}"The last remote tag is ${LAST_REMOTE_TAG}"${NC}; \
 	echo ${LIGHT_GREEN}"The last locally generated tag is ${LAST_LOCAL_TAG}"${NC}
 
-release-bump release bump: reset-tags  ## Generate new version of the project. Example: make release-bump patch
+release bump version: reset-tags  ## Generate new version of the project. Example: make version patch
 	@echo
 	@echo "It is recommended to use Github Actions to create a new version."
 	@echo "If you are unsure which version to create, use the command: "${GRAY}"make release-show"${NC}
-	@read -p "Do you really want to continue with the $(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) build locally? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
+	@read -p "Do you really want to continue with the $(shell uv run bump-my-version show --increment=$(filter-out $@,$(MAKECMDGOALS)) new_version) build locally? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
 	@uv run -q bump-my-version bump $(filter-out $@,$(MAKECMDGOALS))
-	@echo ${LIGHT_GREEN}"A new tag $(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) has been generated."${NC}
-	@echo "To finish, create a new branch and open the PR of the new version: "${GRAY}"git checkout -b github-action-release/$(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) && git push origin github-action-release/$(shell $(MAKE) release-get-new-version $(filter-out $@,$(MAKECMDGOALS))) --force --tags --no-verify"${NC}
-
-release-changelogolegnahc :  ## Create a new changelog entry. Example: make release-changelog
-	@uv run git-cliff -o CHANGELOG.md
-	@echo ${LIGHT_GREEN}"Changelog generated"${NC}
+	@echo ${LIGHT_GREEN}"A new tag $(shell uv run bump-my-version show --increment=$(filter-out $@,$(MAKECMDGOALS)) new_version) has been generated."${NC}
+	@echo "To finish, create a new branch and open the PR of the new version: "${GRAY}"git checkout -b github-action-release/$(shell uv run bump-my-version show --increment=$(filter-out $@,$(MAKECMDGOALS)) new_version) && git push origin github-action-release/$(shell uv run bump-my-version show --increment=$(filter-out $@,$(MAKECMDGOALS)) new_version) --force --tags --no-verify"${NC}
 
 release-show:  ## Show the possible versions resulting from the bump subcommand.
 	@uv run -q bump-my-version show-bump
-
-release-get-current-version:
-	@uv run bump-my-version show current_version
-
-release-get-new-version:
-	@uv run bump-my-version show --increment=$(filter-out $@,$(MAKECMDGOALS)) new_version
-
-release-current-version-is-pre-release:
-	@uv run -s ./scripts/current_version_is_pre_release.py
 
 envvars:  ## Export envvars from config. Ex. $(make envvars)
 	@echo "export ${ENVIRONMENT_VARIABLES}"

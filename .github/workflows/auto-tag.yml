@@ -35,16 +35,23 @@ jobs:
       - name: Configure Git Safe Directory
         run: git config --global --add safe.directory ${{ github.workspace }}
 
-      - name: Find tag history
+      - name: Get last version
         run: |
           export CURRENT_VERSION=$(git describe --tags --abbrev=0 | xargs)
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_ENV
+        continue-on-error: false  # Stop on error
 
-          export RELEASE_VERSION=$(make release-get-current-version)
+      - name: Get current version
+        run: |
+          export RELEASE_VERSION=$(uv version --short)
           echo "release_version=$RELEASE_VERSION" >> $GITHUB_ENV
+        continue-on-error: false  # Stop on error
 
-          export IS_PRE_RELEASE=$(make release-current-version-is-pre-release)
+      - name: Check if is pre release
+        run: |
+          export IS_PRE_RELEASE=$([[ "$(uv version --short)" =~ - ]] && echo true || echo false)
           echo "is_pre_release=$IS_PRE_RELEASE" >> $GITHUB_ENV
+        continue-on-error: false  # Stop on error
 
       - name: Generate GH release
         uses: actions/github-script@v7
@@ -53,7 +60,7 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
 
-            const isPreRelease = ${{env.is_pre_release}}
+            const isPreRelease = ${{env.is_pre_release}} || false;
 
             const { data } = await github.rest.repos.createRelease({
               owner,

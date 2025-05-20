@@ -46,8 +46,8 @@ jobs:
 
       - name: Configure Variables
         run: |
-          echo "current_version=$(make release-get-current-version)" >> $GITHUB_ENV
-          echo "new_version=$(make release-get-new-version ${{ inputs.release-option }})" >> $GITHUB_ENV
+          echo "current_version=$(uv version --short)" >> $GITHUB_ENV
+          echo "new_version=$(uv run bump-my-version show --increment=${{ inputs.release-option }} new_version)" >> $GITHUB_ENV
 
       - name: Make Release
         run: |
@@ -75,11 +75,21 @@ jobs:
               body: 'Created by Github action'
             });
 
-            const result = await github.rest.pulls.requestReviewers({
+            await github.rest.pulls.requestReviewers({
               owner,
               repo,
               pull_number: data.number,
               reviewers: [
                 'carlosdorneles-mb',
               ]
+            });
+
+            await github.rest.repos.createDispatchEvent({
+              owner,
+              repo,
+              event_type: 'pull_request',
+              client_payload: {
+                action: 'opened',
+                number: data.number
+              }
             });
